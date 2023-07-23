@@ -6,8 +6,8 @@ namespace Zlodes\PrometheusClient\Tests\KeySerialization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Zlodes\PrometheusClient\Exceptions\MetricKeySerializationException;
-use Zlodes\PrometheusClient\Exceptions\MetricKeyUnserializationException;
+use Zlodes\PrometheusClient\Exception\MetricKeySerializationException;
+use Zlodes\PrometheusClient\Exception\MetricKeyUnserializationException;
 use Zlodes\PrometheusClient\KeySerialization\JsonSerializer;
 use Zlodes\PrometheusClient\Storage\DTO\MetricNameWithLabels;
 
@@ -89,6 +89,21 @@ class JsonSerializerTest extends TestCase
         yield 'empty string' => [
             '',
             'Expected a non-empty value',
+        ];
+
+        yield 'malformed labels' => [
+            'foo|false',
+            'Expected an array. Got: boolean',
+        ];
+
+        yield 'empty label' => [
+            'foo|{"bar":""}',
+            'Expected a different value than ""',
+        ];
+
+        yield 'malformed json' => [
+            'foo|{"bar":"baz}',
+            'Control character error, possibly incorrectly encoded',
         ];
     }
 

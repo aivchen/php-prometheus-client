@@ -6,13 +6,18 @@ namespace Zlodes\PrometheusClient\Collector\ByType;
 
 use Psr\Log\LoggerInterface;
 use Zlodes\PrometheusClient\Collector\WithLabels;
-use Zlodes\PrometheusClient\Exceptions\StorageWriteException;
-use Zlodes\PrometheusClient\MetricTypes\Gauge;
+use Zlodes\PrometheusClient\Exception\StorageWriteException;
+use Zlodes\PrometheusClient\Metric\Gauge;
 use Zlodes\PrometheusClient\Storage\DTO\MetricNameWithLabels;
 use Zlodes\PrometheusClient\Storage\DTO\MetricValue;
 use Zlodes\PrometheusClient\Storage\Storage;
 
-final class GaugeCollector
+/**
+ * @internal Zlodes\PrometheusClient\Collector
+ *
+ * @final
+ */
+class GaugeCollector
 {
     use WithLabels;
 

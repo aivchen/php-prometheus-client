@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Zlodes\PrometheusClient\Collector\ByType\HistogramCollector;
 use PHPUnit\Framework\TestCase;
-use Zlodes\PrometheusClient\Exceptions\StorageWriteException;
-use Zlodes\PrometheusClient\MetricTypes\Histogram;
+use Zlodes\PrometheusClient\Exception\StorageWriteException;
+use Zlodes\PrometheusClient\Metric\Histogram;
 use Zlodes\PrometheusClient\Storage\DTO\MetricValue;
 use Zlodes\PrometheusClient\Storage\Storage;
 
@@ -76,7 +76,6 @@ class HistogramCollectorTest extends TestCase
         self::assertTrue($metricValue->value > 0.02 && $metricValue->value < 0.021);
         self::assertEquals(['route' => '/'], $metricValue->metricNameWithLabels->labels);
     }
-
 
     public function testsPersistError(): void
     {

@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Zlodes\PrometheusClient\Collector\ByType;
 
 use Psr\Log\LoggerInterface;
-use Webmozart\Assert\Assert;
 use Zlodes\PrometheusClient\Collector\WithLabels;
-use Zlodes\PrometheusClient\Exceptions\StorageWriteException;
-use Zlodes\PrometheusClient\MetricTypes\Histogram;
+use Zlodes\PrometheusClient\Exception\StorageWriteException;
+use Zlodes\PrometheusClient\Metric\Histogram;
 use Zlodes\PrometheusClient\Storage\DTO\MetricNameWithLabels;
 use Zlodes\PrometheusClient\Storage\DTO\MetricValue;
 use Zlodes\PrometheusClient\Storage\Storage;
 
-final class HistogramCollector
+/**
+ * @internal Zlodes\PrometheusClient\Collector
+ *
+ * @final
+ */
+class HistogramCollector
 {
     use WithLabels;
 
@@ -26,8 +30,6 @@ final class HistogramCollector
 
     public function update(float|int $value): void
     {
-        Assert::true($value > 0, 'Value of Histogram metric MUST be positive');
-
         $histogram = $this->histogram;
         $labels = $this->composeLabels();
         $buckets = $this->histogram->getBuckets();

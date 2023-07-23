@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zlodes\PrometheusClient\MetricTypes;
+namespace Zlodes\PrometheusClient\Metric;
 
 use InvalidArgumentException;
 use Webmozart\Assert\Assert;
@@ -80,11 +80,7 @@ final class Histogram extends BaseMetric
         $bucketsSize = count($buckets);
 
         for ($i = 1; $i < $bucketsSize; $i++) {
-            Assert::greaterThan(
-                $buckets[$i],
-                $buckets[$i - 1],
-                "Buckets MUST be sorted in increasing order, got {$buckets[$i - 1]} and {$buckets[$i]}"
-            );
+            Assert::greaterThan($buckets[$i], $buckets[$i - 1], 'Buckets MUST be sorted in increasing order');
         }
     }
 }

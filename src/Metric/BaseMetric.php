@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zlodes\PrometheusClient\MetricTypes;
+namespace Zlodes\PrometheusClient\Metric;
 
 use Webmozart\Assert\Assert;
 
@@ -11,7 +11,7 @@ use Webmozart\Assert\Assert;
  *
  * This class shouldn't be used directly anywhere.
  *
- * @internal Zlodes\PrometheusExporter\MetricTypes
+ * @internal Zlodes\PrometheusExporter\Metric
  */
 abstract class BaseMetric implements Metric
 {
@@ -25,7 +25,8 @@ abstract class BaseMetric implements Metric
         private readonly string $help,
         private readonly array $initialLabels = [],
     ) {
-        Assert::regex($name, '/^[a-zA-Z_:][a-zA-Z0-9_:]*$/', 'Metric name MUST be in snake case');
+        Assert::regex($name, '/^[a-zA-Z][a-zA-Z0-9_:]*$/', 'Metric name MUST be in snake case');
+        Assert::allString(array_keys($initialLabels));
         Assert::allString($initialLabels);
         Assert::allNotEmpty($initialLabels);
     }

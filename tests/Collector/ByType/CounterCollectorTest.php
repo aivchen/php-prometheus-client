@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Zlodes\PrometheusClient\Tests\Collector\ByType;
 
+use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Zlodes\PrometheusClient\Collector\ByType\CounterCollector;
-use Zlodes\PrometheusClient\Exceptions\StorageWriteException;
-use Zlodes\PrometheusClient\MetricTypes\Counter;
+use Zlodes\PrometheusClient\Exception\StorageWriteException;
+use Zlodes\PrometheusClient\Metric\Counter;
 use Zlodes\PrometheusClient\Storage\DTO\MetricValue;
 use Zlodes\PrometheusClient\Storage\Storage;
 
@@ -74,5 +76,25 @@ class CounterCollectorTest extends TestCase
             ->expects('error');
 
         $collector->increment();
+    }
+
+    #[DataProvider('badIncrementValuesDataProvider')]
+    public function testIncrementWithBadValues(int $value): void
+    {
+        $collector = new CounterCollector(
+            new Counter('mileage', 'Mileage in kilometres'),
+            Mockery::mock(Storage::class),
+            new NullLogger()
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $collector->increment($value);
+    }
+
+    public static function badIncrementValuesDataProvider(): iterable
+    {
+        yield 'negative' => [-1];
+        yield 'zero' => [0];
     }
 }
