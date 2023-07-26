@@ -19,7 +19,7 @@ use Zlodes\PrometheusClient\Storage\Storage;
  */
 class CollectorFactory
 {
-    final public function __construct(
+    public function __construct(
         private readonly Registry $registry,
         private readonly Storage $storage,
         private readonly LoggerInterface $logger,
@@ -27,6 +27,8 @@ class CollectorFactory
     }
 
     /**
+     * @final
+     *
      * @param non-empty-string $counterName
      *
      * @return CounterCollector
@@ -34,7 +36,7 @@ class CollectorFactory
      * @throws MetricNotFoundException
      * @throws MetricHasWrongTypeException
      */
-    final public function counter(string $counterName): CounterCollector
+    public function counter(string $counterName): CounterCollector
     {
         $counter = $this->registry->getCounter($counterName);
 
@@ -46,6 +48,8 @@ class CollectorFactory
     }
 
     /**
+     * @final
+     *
      * @param non-empty-string $gaugeName
      *
      * @return GaugeCollector
@@ -53,7 +57,7 @@ class CollectorFactory
      * @throws MetricNotFoundException
      * @throws MetricHasWrongTypeException
      */
-    final public function gauge(string $gaugeName): GaugeCollector
+    public function gauge(string $gaugeName): GaugeCollector
     {
         $gauge = $this->registry->getGauge($gaugeName);
 
@@ -65,6 +69,8 @@ class CollectorFactory
     }
 
     /**
+     * @final
+     *
      * @param non-empty-string $histogramName
      *
      * @return HistogramCollector
