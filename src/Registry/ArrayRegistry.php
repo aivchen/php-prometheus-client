@@ -12,6 +12,7 @@ use Zlodes\PrometheusClient\Metric\Gauge;
 use Zlodes\PrometheusClient\Metric\Histogram;
 use Zlodes\PrometheusClient\Metric\Metric;
 use Zlodes\PrometheusClient\Metric\MetricType;
+use Zlodes\PrometheusClient\Metric\Summary;
 
 final class ArrayRegistry implements Registry
 {
@@ -74,6 +75,17 @@ final class ArrayRegistry implements Registry
 
         if (!$metric instanceof Histogram) {
             throw new MetricHasWrongTypeException(MetricType::HISTOGRAM, $metric->getType());
+        }
+
+        return $metric;
+    }
+
+    public function getSummary(string $name): Summary
+    {
+        $metric = $this->getMetric($name) ?? throw new MetricNotFoundException("Metric $name is not registered");
+
+        if (!$metric instanceof Summary) {
+            throw new MetricHasWrongTypeException(MetricType::SUMMARY, $metric->getType());
         }
 
         return $metric;

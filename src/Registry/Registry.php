@@ -11,6 +11,7 @@ use Zlodes\PrometheusClient\Metric\Counter;
 use Zlodes\PrometheusClient\Metric\Gauge;
 use Zlodes\PrometheusClient\Metric\Histogram;
 use Zlodes\PrometheusClient\Metric\Metric;
+use Zlodes\PrometheusClient\Metric\Summary;
 
 interface Registry
 {
@@ -43,4 +44,10 @@ interface Registry
      * @throws MetricHasWrongTypeException Will be thrown when found metric has unexpected type (e.g. Counter)
      */
     public function getHistogram(string $name): Histogram;
+
+    /**
+     * @throws MetricNotFoundException Will be thrown when a metric with specified name isn't registered
+     * @throws MetricHasWrongTypeException Will be thrown when found metric has unexpected type (e.g. Counter)
+     */
+    public function getSummary(string $name): Summary;
 }

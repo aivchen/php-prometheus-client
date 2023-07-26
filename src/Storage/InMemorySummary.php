@@ -15,6 +15,8 @@ final class InMemorySummary
         private array $items = [],
         private readonly int $maxLength = 1_000_000,
     ) {
+        Assert::greaterThan($maxLength, 2);
+        Assert::maxCount($items, $maxLength);
     }
 
     /**
@@ -24,8 +26,11 @@ final class InMemorySummary
     {
         array_push($this->items, ...$values);
 
-        if (count($this->items) > $this->maxLength) {
-            array_shift($this->items);
+        $newCount = count($this->items);
+        $countDifference = $newCount - $this->maxLength;
+
+        if ($countDifference > 0) {
+            $this->items = array_slice($this->items, $countDifference);
         }
     }
 
@@ -39,7 +44,20 @@ final class InMemorySummary
         return array_sum($this->items);
     }
 
-    public function getQuantile(float $quantile): float|int
+    /**
+     * @return list<int|float>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * @param float $quantile
+     *
+     * @return float|int|null Calculated quantile value or null if there are no items
+     */
+    public function getQuantile(float $quantile): float|int|null
     {
         Assert::range($quantile, 0.0, 1.0);
 
@@ -47,9 +65,8 @@ final class InMemorySummary
 
         $itemsCount = count($items);
 
-        // TODO: Is that correct?
         if ($itemsCount === 0) {
-            return 0;
+            return null;
         }
 
         if ($itemsCount === 1) {
@@ -60,24 +77,19 @@ final class InMemorySummary
 
         $index = $quantile * (count($items) - 1);
 
+        $integerIndex = (int) $index;
+        $fractionalPartOfIndex = fmod($index, 1);
+
+        $integerIndexValue = $items[$integerIndex];
+
         // If index is a whole number we should return the exact item
-        if (fmod($index, 1) === 0.0) {
-            return $items[(int) $index];
+        if ($fractionalPartOfIndex === 0.0) {
+            return $integerIndexValue;
         }
 
-        // Otherwise we should interpolate between the two nearest items
-        $indexBefore = (int) floor($index);
-        $indexAfter = (int) ceil($index);
-
-        // Index after might be out of bounds
-        if ($indexAfter >= $itemsCount - 1) {
-            return $items[$indexBefore];
-        }
-
-        $valueBefore = $items[$indexBefore];
-        $valueAfter = $items[$indexAfter];
+        $nextIndexValue = $items[$integerIndex + 1];
 
         // Linear interpolation to get the exact quantile value
-        return $valueBefore + ($valueAfter - $valueBefore) * ($index - $indexBefore);
+        return $integerIndexValue + $fractionalPartOfIndex * ($nextIndexValue - $integerIndexValue);
     }
 }

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Zlodes\PrometheusClient\Collector\ByType;
 
 use Psr\Log\LoggerInterface;
-use Webmozart\Assert\Assert;
+use Zlodes\PrometheusClient\Collector\Timer;
+use Zlodes\PrometheusClient\Collector\UpdatableCollector;
 use Zlodes\PrometheusClient\Collector\WithLabels;
 use Zlodes\PrometheusClient\Exception\StorageWriteException;
-use Zlodes\PrometheusClient\Metric\Counter;
+use Zlodes\PrometheusClient\Metric\Summary;
 use Zlodes\PrometheusClient\Storage\DTO\MetricNameWithLabels;
 use Zlodes\PrometheusClient\Storage\DTO\MetricValue;
 use Zlodes\PrometheusClient\Storage\Storage;
@@ -16,7 +17,7 @@ use Zlodes\PrometheusClient\Storage\Storage;
 /**
  * @final
  */
-class CounterCollector
+final class SummaryCollector implements UpdatableCollector
 {
     use WithLabels;
 
@@ -24,34 +25,32 @@ class CounterCollector
      * @internal Zlodes\PrometheusClient\Collector
      */
     public function __construct(
-        private readonly Counter $counter,
+        private readonly Summary $summary,
         private readonly Storage $storage,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    /**
-     * @param positive-int|float $value
-     *
-     * @return void
-     */
-    public function increment(int|float $value = 1): void
+    public function update(float|int $value): void
     {
-        Assert::true($value > 0, 'Increment value of Counter metric MUST be positive');
-
-        $counter = $this->counter;
+        $summary = $this->summary;
         $labels = $this->composeLabels();
 
         try {
-            $this->storage->incrementValue(
+            $this->storage->persistSummary(
                 new MetricValue(
-                    new MetricNameWithLabels($counter->getName(), $labels),
-                    $value
+                    new MetricNameWithLabels($summary->getName(), $labels),
+                    $value,
                 )
             );
         } catch (StorageWriteException $e) {
-            $this->logger->error("Cannot increment counter {$counter->getName()}: $e");
+            $this->logger->error("Cannot persist Summary {$summary->getName()}: $e");
         }
+    }
+
+    public function startTimer(): Timer
+    {
+        return new Timer($this);
     }
 
     /**
@@ -59,6 +58,6 @@ class CounterCollector
      */
     private function composeLabels(): array
     {
-        return array_merge($this->counter->getInitialLabels(), $this->labels);
+        return array_merge($this->summary->getInitialLabels(), $this->labels);
     }
 }

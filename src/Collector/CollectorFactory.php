@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Zlodes\PrometheusClient\Collector\ByType\CounterCollector;
 use Zlodes\PrometheusClient\Collector\ByType\GaugeCollector;
 use Zlodes\PrometheusClient\Collector\ByType\HistogramCollector;
+use Zlodes\PrometheusClient\Collector\ByType\SummaryCollector;
 use Zlodes\PrometheusClient\Exception\MetricHasWrongTypeException;
 use Zlodes\PrometheusClient\Exception\MetricNotFoundException;
 use Zlodes\PrometheusClient\Registry\Registry;
@@ -63,12 +64,39 @@ class CollectorFactory
         );
     }
 
+    /**
+     * @param non-empty-string $histogramName
+     *
+     * @return HistogramCollector
+     *
+     * @throws MetricNotFoundException
+     * @throws MetricHasWrongTypeException
+     */
     final public function histogram(string $histogramName): HistogramCollector
     {
         $histogram = $this->registry->getHistogram($histogramName);
 
         return new HistogramCollector(
             $histogram,
+            $this->storage,
+            $this->logger
+        );
+    }
+
+    /**
+     * @param non-empty-string $summaryName
+     *
+     * @return SummaryCollector
+     *
+     * @throws MetricNotFoundException
+     * @throws MetricHasWrongTypeException
+     */
+    final public function summary(string $summaryName): SummaryCollector
+    {
+        $summary = $this->registry->getSummary($summaryName);
+
+        return new SummaryCollector(
+            $summary,
             $this->storage,
             $this->logger
         );

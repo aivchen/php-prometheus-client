@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Zlodes\PrometheusClient\Collector\ByType;
+namespace Zlodes\PrometheusClient\Collector;
 
-final class HistogramTimer
+final class Timer
 {
     private float $startedAt;
 
+    /**
+     * @internal Zlodes\PrometheusClient\Collector
+     */
     public function __construct(
-        private readonly HistogramCollector $collector,
+        private readonly UpdatableCollector $collector,
     ) {
         $this->startedAt = microtime(true);
     }

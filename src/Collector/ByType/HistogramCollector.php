@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Zlodes\PrometheusClient\Collector\ByType;
 
 use Psr\Log\LoggerInterface;
+use Zlodes\PrometheusClient\Collector\Timer;
+use Zlodes\PrometheusClient\Collector\UpdatableCollector;
 use Zlodes\PrometheusClient\Collector\WithLabels;
 use Zlodes\PrometheusClient\Exception\StorageWriteException;
 use Zlodes\PrometheusClient\Metric\Histogram;
@@ -13,14 +15,15 @@ use Zlodes\PrometheusClient\Storage\DTO\MetricValue;
 use Zlodes\PrometheusClient\Storage\Storage;
 
 /**
- * @internal Zlodes\PrometheusClient\Collector
- *
  * @final
  */
-class HistogramCollector
+class HistogramCollector implements UpdatableCollector
 {
     use WithLabels;
 
+    /**
+     * @internal Zlodes\PrometheusClient\Collector
+     */
     public function __construct(
         private readonly Histogram $histogram,
         private readonly Storage $storage,
@@ -47,9 +50,9 @@ class HistogramCollector
         }
     }
 
-    public function startTimer(): HistogramTimer
+    public function startTimer(): Timer
     {
-        return new HistogramTimer($this);
+        return new Timer($this);
     }
 
     /**
