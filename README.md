@@ -101,8 +101,7 @@ $requestTimer->stop();
 // Export metrics
 $exporter = new StoredMetricsExporter(
     $registry,
-    $storage,
-    new NullLogger(),
+    $storage
 );
 
 foreach ($exporter->export() as $metricOutput) {
